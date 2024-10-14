@@ -1,3 +1,5 @@
+vim.loop = vim.uv or vim.loop
+
 local from_entry = require "telescope.from_entry"
 local Path = require "plenary.path"
 local utils = require "telescope.utils"
@@ -329,7 +331,7 @@ local scroll_horizontal_fn = function(self, direction)
   local count = math.abs(direction)
 
   vim.api.nvim_win_call(self.state.winid, function()
-    vim.api.nvim_win_set_option(self.state.winid, "virtualedit", "all")
+    vim.api.nvim_set_option_value("virtualedit", "all", { win = self.state.winid })
     vim.cmd([[normal! ]] .. count .. input)
   end)
 end
@@ -426,7 +428,7 @@ previewers.new_buffer_previewer = function(opts)
     else
       local bufnr = vim.api.nvim_create_buf(false, true)
       set_bufnr(self, bufnr)
-      vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+      vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
 
       vim.schedule(function()
         if vim.api.nvim_buf_is_valid(bufnr) then
@@ -434,11 +436,11 @@ previewers.new_buffer_previewer = function(opts)
         end
       end)
 
-      vim.api.nvim_win_set_option(preview_winid, "winhl", "Normal:TelescopePreviewNormal")
-      vim.api.nvim_win_set_option(preview_winid, "signcolumn", "no")
-      vim.api.nvim_win_set_option(preview_winid, "foldlevel", 100)
-      vim.api.nvim_win_set_option(preview_winid, "wrap", false)
-      vim.api.nvim_win_set_option(preview_winid, "scrollbind", false)
+      vim.api.nvim_set_option_value("winhl", "Normal:TelescopePreviewNormal", { win = preview_winid })
+      vim.api.nvim_set_option_value("signcolumn", "no", { win = preview_winid })
+      vim.api.nvim_set_option_value("foldlevel", 100, { win = preview_winid })
+      vim.api.nvim_set_option_value("wrap", false, { win = preview_winid })
+      vim.api.nvim_set_option_value("scrollbind", false, { win = preview_winid })
 
       self.state.winid = preview_winid
       self.state.bufname = nil
@@ -552,7 +554,7 @@ previewers.vimgrep = defaulter(function(opts)
   end
 
   return previewers.new_buffer_previewer {
-    title = "Grep Preview",
+    title = opts.preview_title or "Grep Preview",
     dyn_title = function(_, entry)
       return Path:new(from_entry.path(entry, false, false)):normalize(cwd)
     end,
@@ -565,7 +567,7 @@ previewers.vimgrep = defaulter(function(opts)
       -- builtin.buffers: bypass path validation for terminal buffers that don't have appropriate path
       local has_buftype = entry.bufnr
           and vim.api.nvim_buf_is_valid(entry.bufnr)
-          and vim.api.nvim_buf_get_option(entry.bufnr, "buftype") ~= ""
+          and vim.api.nvim_get_option_value("buftype", { buf = entry.bufnr }) ~= ""
         or false
       local p
       if not has_buftype then
@@ -663,7 +665,7 @@ end, {})
 
 previewers.builtin = defaulter(function(opts)
   return previewers.new_buffer_previewer {
-    title = "Grep Preview",
+    title = opts.preview_title or "Grep Preview",
     teardown = search_teardown,
 
     get_buffer_by_name = function(_, entry)
@@ -1052,7 +1054,7 @@ previewers.autocommands = defaulter(function(_)
           )
         end
 
-        vim.api.nvim_buf_set_option(self.state.bufnr, "filetype", "vim")
+        vim.api.nvim_set_option_value("filetype", "vim", { buf = self.state.bufnr })
         vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, display)
         vim.api.nvim_buf_add_highlight(self.state.bufnr, 0, "TelescopeBorder", 1, 0, -1)
       else

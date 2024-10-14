@@ -1,3 +1,5 @@
+vim.loop = vim.uv or vim.loop
+
 local conf = require("telescope.config").values
 local utils = require "telescope.utils"
 local Path = require "plenary.path"
@@ -286,7 +288,9 @@ previewers.vimgrep = defaulter(function(opts)
       if p == nil or p == "" then
         return
       end
-      if entry.bufnr and (p == "[No Name]" or vim.api.nvim_buf_get_option(entry.bufnr, "buftype") ~= "") then
+      if
+        entry.bufnr and (p == "[No Name]" or vim.api.nvim_get_option_value("buftype", { buf = entry.bufnr }) ~= "")
+      then
         return
       end
 
@@ -308,7 +312,7 @@ previewers.qflist = defaulter(function(opts)
   local cwd = opts.cwd or vim.loop.cwd()
 
   return previewers.new_termopen_previewer {
-    title = "Grep Preview",
+    title = opts.preview_title or "Grep Preview",
     dyn_title = function(_, entry)
       return Path:new(from_entry.path(entry, false, false)):normalize(cwd)
     end,

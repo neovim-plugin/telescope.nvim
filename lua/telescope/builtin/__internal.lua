@@ -1,3 +1,5 @@
+vim.loop = vim.uv or vim.loop
+
 local actions = require "telescope.actions"
 local action_set = require "telescope.actions.set"
 local action_state = require "telescope.actions.state"

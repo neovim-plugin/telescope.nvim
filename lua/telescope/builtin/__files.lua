@@ -383,6 +383,7 @@ files.find_files = function(opts)
   end
 
   opts.entry_maker = opts.entry_maker or make_entry.gen_from_file(opts)
+  opts.preview_title = "File Preview"
 
   pickers
     .new(opts, {

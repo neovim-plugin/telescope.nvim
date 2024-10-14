@@ -1,5 +1,7 @@
 require "telescope"
 
+vim.loop = vim.uv or vim.loop
+
 local a = vim.api
 
 local async = require "plenary.async"

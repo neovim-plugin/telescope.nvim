@@ -1,3 +1,5 @@
+vim.loop = vim.uv or vim.loop
+
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local finders = require "telescope.finders"
@@ -45,6 +47,8 @@ git.files = function(opts)
     opts.git_command,
     git_command({ "-c", "core.quotepath=false", "ls-files", "--exclude-standard", "--cached" }, opts)
   )
+
+  opts.preview_title = "File Preview"
 
   pickers
     .new(opts, {
